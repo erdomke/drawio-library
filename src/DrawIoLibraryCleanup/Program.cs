@@ -17,6 +17,11 @@ namespace DrawIoLibraryCleanup
 
     static void Main(string[] args)
     {
+      ProcessClarityFiles();
+    }
+
+    private static void ProcessClarityFiles()
+    {
       foreach (var directory in Directory.GetDirectories(sourcePath).OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
       {
         CreateLibrary(directory);
@@ -83,6 +88,10 @@ namespace DrawIoLibraryCleanup
       svg.AddFirst(styleElem);
       var xmlString = svg.ToString(SaveOptions.DisableFormatting);
 
+      var viewBoxParts = ((string)svg.Attribute("viewBox") ?? "").Split(' ');
+      var width = (int?)svg.Attribute("width") ?? int.Parse(viewBoxParts[2]);
+      var height = (int?)svg.Attribute("height") ?? int.Parse(viewBoxParts[3]);
+
       var mxGraph = new XElement("mxGraphModel"
         , new XElement("root"
           , new XElement("mxCell", new XAttribute("id", "0"))
@@ -92,8 +101,8 @@ namespace DrawIoLibraryCleanup
             , new XAttribute("vertex", "1")
             , new XAttribute("parent", "1")
             , new XElement("mxGeometry"
-              , new XAttribute("width", (int)svg.Attribute("width"))
-              , new XAttribute("height", (int)svg.Attribute("height"))
+              , new XAttribute("width", width)
+              , new XAttribute("height", height)
               , new XAttribute("as", "geometry")
             )
           )
@@ -109,8 +118,8 @@ namespace DrawIoLibraryCleanup
       var jsonDict = new Dictionary<string, object>()
       {
         { "xml", Convert.ToBase64String(zippedStream.ToArray()) },
-        { "w", (int)svg.Attribute("width") },
-        { "h", (int)svg.Attribute("height") },
+        { "w", width },
+        { "h", height },
         { "title", title },
         { "aspect", "fixed" }
       };
