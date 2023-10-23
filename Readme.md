@@ -1,0 +1,1 @@
+This repository contains icon sets packaged for use with [draw.io](https://www.drawio.com/).
